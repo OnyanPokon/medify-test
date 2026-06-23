@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,15 +20,43 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/master-items', [App\Http\Controllers\MasterItemsController::class, 'index']);
-Route::get('/master-items/search', [App\Http\Controllers\MasterItemsController::class, 'search']);
-Route::get('/master-items/form/{method}/{id?}', [App\Http\Controllers\MasterItemsController::class, 'formView']);
-Route::post('/master-items/form/{method}/{id?}', [App\Http\Controllers\MasterItemsController::class, 'formSubmit']);
+Route::middleware(['auth'])->group(function () {
 
-Route::get('/master-items/view/{kode}', [App\Http\Controllers\MasterItemsController::class, 'singleView']);
-Route::get('/master-items/delete/{id}', [App\Http\Controllers\MasterItemsController::class, 'delete']);
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])
+        ->name('home');
 
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
+        ->name('home');
 
-Route::get('/master-items/update-random-data', [App\Http\Controllers\MasterItemsController::class, 'updateRandomData']);
+    Route::prefix('master-items')
+        ->controller(App\Http\Controllers\MasterItemsController::class)
+        ->group(function () {
+
+            Route::get('/', 'index');
+            Route::get('/search', 'search');
+
+            Route::get('/form/{method}/{id?}', 'formView');
+            Route::post('/form/{method}/{id?}', 'formSubmit');
+
+            Route::get('/view/{kode}', 'singleView');
+            Route::get('/export-excel', 'exportExcel');
+            Route::get('/delete/{id}', 'delete');
+
+            Route::get('/update-random-data', 'updateRandomData');
+        });
+
+    Route::prefix('kategoris')
+        ->controller(App\Http\Controllers\KategoriController::class)
+        ->group(function () {
+
+            Route::get('/', 'index'); 
+            Route::get('/search', 'search');
+            Route::get('/print/{kode}', 'exportPdf');
+
+            Route::get('/form/{method}/{id?}', 'formView');
+            Route::post('/form/{method}/{id?}', 'formSubmit');
+
+            Route::get('/view/{id}', 'singleView');
+            Route::get('/delete/{id}', 'delete');
+        });
+});

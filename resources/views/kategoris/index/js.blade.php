@@ -33,15 +33,13 @@
         dataTableObj.clear().draw();
 
         $.ajax({
-            url: '{{ url('master-items/search') }}',
+            url: '{{ url('kategoris/search') }}',
             dataType: 'json',
             tryCount: 0,
             retryLimit: 3,
-            data: 'kode=' + filter_kode + '&nama=' + filter_nama + '&hargamin=' + filter_harga_min +
-                '&hargamax=' + filter_harga_max,
+            data: 'kode=' + filter_kode + '&nama=' + filter_nama ,
             success: function(results) {
                 var data = results.data
-
 
                 $.each(data, function(index, item) {
                     array_temp = [];
@@ -49,23 +47,20 @@
                     harga_jual = Math.round(harga_jual)
                     var kode = item.kode;
 
-                    var html = `<a href="{{ url('master-items/view/') }}/` + kode +
+                    var html = `<a href="{{ url('kategoris/view/') }}/` + kode +
                         `" class="btn btn-primary">View</a>`
 
-                    var exportToExcelButton = `<a href="{{ url('master-items/export-excel') }}" class="btn btn-secondary">To Excel</a>`
+                    var printPdfButton = `<a href="{{ url('kategoris/print/') }}/` + kode +
+                        `" class="btn btn-secondary">To PDF</a>`
 
-                    var foto_produk = item.foto_produk ? `<img class="img-thumbnail" src="{{ asset('storage/') }}/` + item
-                        .foto_produk + `" alt="Foto Produk" width="100">` : 'Tidak ada foto'
 
                     $.each(item, function(obj_name, obj_value) {
-                        if (obj_name == 'laba') return false;
+
                         array_temp.push(obj_value)
                     })
-                    array_temp.push(harga_jual)
-                    array_temp.push(item.supplier)
-                    array_temp.push(foto_produk)
+
                     array_temp.push(html)
-                    array_temp.push(exportToExcelButton)
+                    array_temp.push(printPdfButton)
 
 
                     dataTableObj.row.add(array_temp).draw(true);
